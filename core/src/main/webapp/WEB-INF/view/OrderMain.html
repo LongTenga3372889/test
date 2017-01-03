@@ -1,0 +1,338 @@
+<#include "./include/header.html">
+    <body>
+    <style>
+        span.k-icon.k-i-search {
+             top: 10px !important;
+             left: 4px !important;
+        }
+        span[class='k-window-title'] {
+            user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            -webkit-user-select: none;
+            -webkit-touch-callout: none;
+        }
+    </style>
+    <div id="content-container">
+        <div id="page-content">
+            <div class="panel" style="padding: 0px;border:none;box-shadow: none;">
+                <form class="form-horizontal" id="myForm">
+                    <div class="panel-body">
+                        <div class="row" style="margin-bottom: 10px;">
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">公司名称</label>
+                                    <div class="col-sm-9">
+                                        <input type="text" style="width: 100%"  id="salename"
+                                               data-bind="value:model.companyId" class="k-textbox">
+                                        <script>
+                                            $("#salename").kendoLov($.extend(${lovProvider.getLov(base.contextPath
+                                                ,base.locale,"LOV_COMPANY")}));
+                                        </script>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">客户名称</label>
+                                    <div class="col-sm-9">
+                                        <input type="text" style="width: 100%" id="username"
+                                               data-bind="value:model.customerName" class="k-textbox">
+                                        <script>
+                                            $("#username").kendoLov($.extend(${lovProvider.getLov(base.contextPath
+                                                ,base.locale,"LOV_CUSTOMER")},{
+                                                query:function(e){
+                                                    e.param['companyId']=viewModel.model.companyId;
+                                                }
+                                            }));
+                                        </script>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">销售订单号</label>
+                                    <div class="col-sm-9">
+                                        <input type="text" style="width: 100%" id="orderNumber"
+                                               data-bind="value:model.orderNumber" class="k-textbox">
+                                    </div>
+                                </div>
+                            </div>
+
+
+                        </div>
+
+                        <div class="row ">
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">物料</label>
+                                    <div class="col-sm-9">
+                                        <input type="text" style="width: 100%" id="orderss"
+                                               data-bind="value:model.nameLike" class="k-textbox">
+                                        <script>
+                                            $("#orderss").kendoLov(<@lov "LOV_ITEM"/>);
+                                        </script>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+
+                                <div class="row">
+                                    <div class="form-group">
+
+                                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                        <label class="control-label ">订单状态</label>
+                                        <select style="width: 180px;height: 28px">
+                                            <option>新建</option>
+                                            <option>已提交</option>
+                                            <option>已拒绝</option>
+                                            <option>已审批</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+
+
+
+
+
+
+
+                <script>
+                    function execle(){
+                        var companyName = document.getElementById("salename").value;
+                        var customerName = document.getElementById("username").value;
+                        var orderNumber = document.getElementById("orderNumber").value;
+                        var nameLike = document.getElementById("orderss").value;
+                        window.location="execle?companyName="+companyName+"&customerName="+customerName+
+                        "&orderNumber="+orderNumber+"&nameLike="+nameLike;
+                    }
+                </script>
+
+                <div class="row">
+                    <div class="col-sm-4">
+                    <span class="btn btn-primary" data-bind="click:queryGrid"
+                          type="submit"><@spring.message "hap.query"/></span>
+                        <span class="btn btn-default" type="button" data-bind="click:resetForm">
+                    <@spring.message "hap.reset"/></span>
+                        <span class="btn btn-default" type="button" onclick="execle();">
+                    导出Excel</span>
+                        <span class="btn btn-default" type="button" onclick="newOrder();">
+                    新建</span>
+                        <script>
+                            function newOrder(){
+                                window.top.openTab("newOrder", '新建订单', 'NewOrder.html', true);
+                            }
+                        </script>
+                    </div>
+                    <div class="col-sm-8" style="margin-bottom: 10px;">
+                        <div class="col-sm-4">
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div style="clear:both">
+                <div id="taskListGrid"  class="table"></div>
+            </div>
+
+        </div>
+    </div>
+
+    <div id="taskDetailWin"></div>
+    <div id="runtimeWin"></div>
+
+    <script type="text/javascript">
+        var prioritySource = new kendo.data.DataSource({
+            data:[
+                { priority: "高", maximumPriority: 100 },
+                { priority: "中", maximumPriority: 66 },
+                { priority: "低", maximumPriority: 33}
+            ]
+        });
+
+        function openDetailWin(taskId, uid) {
+            var rec = dataSource.getByUid(uid);
+            window.top.openTab(taskId, '待办审批', '${base.contextPath}/activiti/task_detail.html?taskId=' + taskId, true);
+        }
+
+        function openRuntimeWin(uid){
+            var rec = dataSource.getByUid(uid);
+            $("#runtimeWin").kendoWindow({
+                actions: ["Close"],
+                title: "流程运行状态",
+                draggable: true,
+                height: "90%",
+                width: "90%",
+                content: "${base.contextPath}/activiti/process_instance.html?processInstanceId=" + rec.processInstanceId,
+                iframe:true,
+                modal: true
+            });
+            var win = $("#runtimeWin").data("kendoWindow");
+            win.center().open();
+        }
+
+        function doQuery() {
+            $('#taskListGrid').data('kendoGrid').dataSource.page(1);
+        }
+
+        function lop(a) {
+            window.top.openTab(a, '订单详情', 'Order.html?a='+a , true);
+        }
+
+        viewModel = kendo.observable({
+            model: {},
+            prioritySource2 :prioritySource,
+            queryGrid: doQuery,
+            resetForm: function (e) {
+                var formData = viewModel.model.toJSON();
+                for (var k in formData) {
+                    viewModel.model.set(k, null);
+                }
+            }
+        });
+        kendo.bind($('#page-content'), viewModel);
+        dataSource = new kendo.data.DataSource(
+            {
+                transport: {
+                    read: {
+                        url: 'findallmessage',
+                        dataType: "json",
+                        contentType: "application/json",
+                        type: "get",
+                    },
+                    destroy: {
+                        url: 'findallmessage',
+                        contentType: "application/json",
+                        type: "POST"
+                    },
+                    parameterMap: function (options, type) {
+                        if (type === "read") {
+                            return {
+                                customerName:viewModel.model.customerName,
+                                companyName:viewModel.model.companyId,
+                                orderNumber:viewModel.model.orderNumber,
+                                nameLike:viewModel.model.nameLike,
+                                orderStatus:viewModel.model.createdBefore,
+                                page:options.page-1,
+                                pageSize:options.pageSize
+                            };
+                        }
+                    }
+                },
+                batch: true,
+                serverPaging: true,
+                pageSize: 10,
+                schema: {
+                    data: 'rows',
+                    total: 'total',
+                    model: {
+                        id: "id",
+                        fields: {}
+                    }
+                }
+            });
+
+        $("#taskListGrid").kendoGrid(
+            {
+                dataSource: dataSource,
+                height: '100%',
+
+                pageSize: 10,
+                pageable: {
+                    refresh: true,
+                    pageSizes: [5,10,20,50],
+                    buttonCount: 5
+                },
+                columns: [
+                    {
+                        field: "orderNumber",
+                        title: '销售订单号',
+                        width: 150,
+                        template:function(data){
+                            var s = data.orderNumber;
+                            return "<a onclick='lop("+s+");' name='+data.orderNumber+' >"+data.orderNumber+"</a>";
+                        }
+                    },
+                    {
+                        field: "companyName",
+                        title: '公司名称',
+                        width: 150
+                    },
+                    {
+                        field: "customerName",
+                        title: '客户名称',
+                        width: 100
+                    },
+                    {
+                        field: "orderDate",
+                        title: '订单日期',
+                        width: 120
+                    },
+                    {
+                        field: "orderStatus",
+                        title: '订单状态',
+                        width: 120
+                    },
+                    {
+                        field: "price",
+                        title: '价格',
+                        width: 100
+                    }],
+                editable: false
+            }).data("kendoGrid");
+        Hap.autoResizeGrid("#taskListGrid");
+
+    </script>
+    <style type="text/css">
+
+        .task-resolved {
+            color: blue;
+        }
+
+        .task-pending {
+            color: lightblue;
+        }
+
+        .priority-low {
+            width: 80%;
+            height: 20px;
+            background: #00AA00;
+            border-radius: 5px 5px 5px 5px;
+            box-shadow: 0 0 3px #947575;
+            text-align: center;
+            line-height: 20px;
+            color: white;
+        }
+
+        .priority-median {
+            width: 80%;
+            height: 20px;
+            background: #FFA500;
+            border-radius: 5px 5px 5px 5px;
+            box-shadow: 0 0 3px #947575;
+            text-align: center;
+            line-height: 20px;
+            color: white;
+        }
+
+        .priority-high {
+            width: 80%;
+            height: 20px;
+            background: #DD0000;
+            border-radius: 5px 5px 5px 5px;
+            box-shadow: 0 0 3px #947575;
+            text-align: center;
+            line-height: 20px;
+            color: white;
+        }
+    </style>
+    </body>
+    </html>

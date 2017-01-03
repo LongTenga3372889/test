@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="hbi.core.hssp.mapper.ItemHeaderMapper">
+   <select id="getItemHeaderMessage" resultType="hbi.core.hssp.dto.ItemHeader">
+       select t.source_system_code sourceSystemCode,
+        t.INTERFACE_NAME interfaceName,
+        t.DESCRIPTION description,
+        t.DATA_TYPE_CODE dataTypeCode,
+        t.creation_date creationDate,
+        t.START_DATE startDate,
+        t.END_DATE endDate,
+        t.Attribute_cateGory attributeCategory,
+        t.ENABLED_FLAG enabledFlag,
+        t.ITEM_HEADER_ID itemHeaderId,
+        h.meaning  validateClass
+        from hss_task_item_header_b t ,sys_code_value_b h
+        where h.value=t.source_system_code
+        <if test="sourceSystemCode!=null and sourceSystemCode!=''">
+            and t.source_system_code=#{sourceSystemCode}
+        </if>
+       <if test="validateClass!=null and validateClass!=''">
+            and h.meaning = #{validateClass}
+       </if>
+       <if test="interfaceName!=null and interfaceName!=''">
+           and h.interfaceName = #{interfaceName}
+       </if>
+       <if test="description!=null and description!=''">
+           and h.description = #{description}
+       </if>
+   </select>
+
+    <select id="findItemHeaderOne" resultType="hbi.core.hssp.dto.ItemHeader">
+        select t.source_system_code sourceSystemCode,
+        t.creation_date creationDate,
+        t.interface_name interfaceName,
+        t.data_type_code dataTypeCode,
+        t.start_date  startDate,
+        t.end_date    endDate,
+        t.Attribute_cateGory attributeCategory,
+        t.description description,
+        t.enabled_flag enabledFlag,
+        t.OBJECT_VERSION_NUMBER objectVersionNumber,
+        t.frozen_flag frozenFlag,
+        h.meaning attribute1
+        from hss_task_item_header_b t,sys_code_value_b h
+        where item_header_id=#{_parameter,jdbcType=VARCHAR} and h.value=t.source_system_code
+    </select>
+
+    <select id="selectSysCode" resultType="hbi.core.hssp.dto.ItemHeader">
+        select source_System_Code sourceSystemCode  from hss_task_item_header_b
+    </select>
+
+    <select id="getUserName" resultType="String" parameterType="long">
+        select user_name from sys_user where user_id=#{userId}
+    </select>
+
+    <select id="getsourceSystemCode" resultType="String">
+        select `value` from sys_code_value_b where meaning = #{_parameter,jdbcType=VARCHAR}
+    </select>
+
+    <delete id="deleteItemHeader" parameterType="long">
+        delete FROM  hss_task_item_header_b where item_header_id=#{itemHeaderId}
+    </delete>
+
+    <delete id="deleteItemLine" parameterType="long">
+        delete FROM  hss_task_item_line_b where item_header_id=#{itemHeaderId}
+    </delete>
+
+    <update id="updateItemHeader" parameterType="hbi.core.hssp.dto.ItemHeader">
+        UPDATE hss_task_item_header_b SET
+        source_system_code = #{sourceSystemCode},
+        interface_name = #{interfaceName},
+        data_type_code = #{dataTypeCode},
+        end_date = #{endDate},
+        description = #{description},
+        enabled_flag = #{enabledFlag},
+        frozen_flag = #{frozenFlag},
+        object_version_number = object_version_number+1
+        WHERE item_header_id = #{itemHeaderId} and object_version_number = #{objectVersionNumber}
+    </update>
+
+    <select id="getItemHeaderId" resultType="long">
+        select ITEM_HEADER_ID FROM  hss_task_item_header_b where INTERFACE_NAME =#{_parameter,jdbcType=VARCHAR}
+    </select>
+</mapper>

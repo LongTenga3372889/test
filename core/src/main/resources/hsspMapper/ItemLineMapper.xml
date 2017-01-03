@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="hbi.core.hssp.mapper.ItemLineMapper">
+    <insert id="saveItemLine" parameterType="hbi.core.hssp.dto.ItemLine">
+        INSERT INTO hss_task_item_line_b (
+        ITEM_HEADER_ID ,TITLE_TEXT,COLUMN_TYPE_CODE,COLUMN_NAME,SEQ_NUM,
+        VALUE_TYPE,COLUMN_LEN,VALUE_SET,COLUMN_FORMAT,REQUIRED_FLAG,SHOW_FLAG,
+        ENABLE_FLAG,UNIQUE_FLAG,CREATION_DATE,LAST_UPDATE_DATE
+        )VALUES (#{itemHeaderId},#{titleText},#{columeTypeCode},#{columnName},
+        #{seqNum},#{valueType},#{columnLen},#{valueSet},#{columnFormat},
+        #{requiredFlag},#{showFlag},#{enableFlag},#{uniqueFlag},#{creationDate},
+        #{lastUpdateDate})
+    </insert>
+
+    <select id="getItemLineList" resultType="hbi.core.hssp.dto.ItemLine">
+        select TITLE_TEXT titleText,COLUMN_TYPE_CODE columeTypeCode,ITEM_LINE_ID itemLineId,
+         COLUMN_NAME columnName,SEQ_NUM seqNum,VALUE_TYPE valueType,OBJECT_VERSION_NUMBER objectVersionNumber,
+         COLUMN_LEN columnLen,VALUE_SET valueSet,COLUMN_FORMAT columnFormat,
+         REQUIRED_FLAG requiredFlag,SHOW_FLAG showFlag,ENABLE_FLAG enableFlag,
+         UNIQUE_FLAG uniqueFlag
+        from hss_task_item_line_b where item_header_id=#{itemHeaderId}
+    </select>
+    <delete id="deleteItemList"  parameterType="long" >
+        DELETE FROM hss_task_item_line_b where item_line_id = #{itemLindId}
+    </delete>
+
+    <update id="updateItemLine" parameterType="hbi.core.hssp.dto.ItemLine">
+        update hss_task_item_line_b SET
+        COLUMN_LEN =#{columnLen},
+        COLUMN_NAME=#{columnName},
+        ENABLE_FLAG=#{enableFlag},
+        SHOW_FLAG=#{showFlag},
+        TITLE_TEXT=#{titleText},
+        UNIQUE_FLAG=#{uniqueFlag},
+        VALUE_SET=#{valueSet},
+        VALUE_TYPE=#{valueType},
+        OBJECT_VERSION_NUMBER=OBJECT_VERSION_NUMBER+1
+        where item_line_id=#{itemLineId} and OBJECT_VERSION_NUMBER=#{objectVersionNumber}
+    </update>
+</mapper>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="hbi.core.sale.mapper.CompanysMapper">
+    <select id="findallmessage" resultType="hbi.core.sale.dto.Middle" parameterType="hbi.core.sale.dto.Middle">
+        select header.order_number orderNumber,company.company_name companyName,customer.customer_name customerName,header.order_date orderDate,
+        header.order_status orderStatus,line.orderd_quantity*line.unit_selling_price  price
+        from hap_ar_customers customer,hap_org_companys company ,hap_om_order_headers header,hap_om_order_lines line,hap_inv_inventory_items item
+        where  header.company_id =company.company_id
+        and header.customer_id=customer.customer_id and line.header_id=header.header_id and item.inventory_item_id=line.inventory_item_id
+        <if test="companyName!=null">
+            and company.company_id=#{companyName}
+        </if>
+        <if test="customerName!=null">
+            and customer.customer_id=#{customerName}
+        </if>
+        <if test="orderNumber!=null">
+            and header.order_number=#{orderNumber}
+        </if>
+        <if test="orderStatus!=null">
+            and header.order_status=#{orderStatus}
+        </if>
+        <if test="nameLike!=null">
+            and item.item_code = #{nameLike}
+        </if>
+    </select>
+</mapper>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="hbi.core.hssp.mapper.ITrxDetailMapper">
+    <select id="findallTrxDetail" resultType="hbi.core.hssp.dto.TrxDetail" parameterType="long">
+        select TRX_DETAIL_ID trxDetailId,TRX_ID trxId,DETAIL_TRX_TYPE detailTrxType,OBJECT_VERSION_NUMBER objectVersionNumber,
+        PARENT_DETAIL_ID parentDetailId,DETAIL_TRX_TYPE_NAME detailTrxTypeName,
+        CATEGORY_CODE categoryCode,IS_DISPLAY_FLAG isDisplayFlag,ATTRIBUTE1 attribute1
+        FROM hss_setup_trx_detail_b where TRX_ID=#{itemHeaderId}
+    </select>
+    <insert id="createTrxDetail" useGeneratedKeys="true" keyProperty="trxDetailId" parameterType="hbi.core.hssp.dto.TrxDetail">
+        insert into hss_setup_trx_detail_b (TRX_ID,DETAIL_TRX_TYPE,DETAIL_TRX_TYPE_NAME,PARENT_DETAIL_ID,
+        CATEGORY_CODE,OBJECT_VERSION_NUMBER,CREATION_DATE,CREATED_BY,LAST_UPDATED_BY,IS_DISPLAY_FLAG,
+        LAST_UPDATE_DATE) values (#{trxId},#{detailTrxType},#{detailTrxTypeName},#{parentDetailId},
+        #{categoryCode},#{objectVersionNumber},#{creationDate},#{createdBy},
+        #{lastUpdatedBy},#{isDisplayFlag},#{creationDate});
+    </insert>
+    <update id="updateTrxDetail" parameterType="hbi.core.hssp.dto.TrxDetail">
+        UPDATE hss_setup_trx_detail_b SET DETAIL_TRX_TYPE = #{detailTrxType},DETAIL_TRX_TYPE_NAME=#{detailTrxTypeName},OBJECT_VERSION_NUMBER=OBJECT_VERSION_NUMBER+1
+        where TRX_DETAIL_ID =#{trxDetailId} and OBJECT_VERSION_NUMBER=#{objectVersionNumber}
+    </update>
+
+    <delete id="deleteTrxDetail" parameterType="long">
+        DELETE FROM hss_setup_trx_detail_b WHERE TRX_DETAIL_ID = #{trxDetailId}
+    </delete>
+    <select id="moreTrxDetail" parameterType="long" resultType="hbi.core.hssp.dto.TrxDetail">
+        select TRX_DETAIL_ID trxDetailId from hss_setup_trx_detail_b where parent_detail_id = #{itemHeaderId}
+    </select>
+</mapper>

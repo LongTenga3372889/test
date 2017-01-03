@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="hbi.core.sale.mapper.OrderHeadersMapper">
+    <select id="execle" resultType="hbi.core.sale.dto.Middle" parameterType="hbi.core.sale.dto.Middle">
+        select header.order_number orderNumber,company.company_name companyName,customer.customer_name customerName,header.order_date orderDate,
+        header.order_status orderStatus,line.orderd_quantity*line.unit_selling_price  price
+        from hap_ar_customers customer,hap_org_companys company ,hap_om_order_headers header,hap_om_order_lines line,hap_inv_inventory_items item
+        where  header.company_id =company.company_id
+        and header.customer_id=customer.customer_id and line.header_id=header.header_id and item.inventory_item_id=line.inventory_item_id
+        <if test="companyName!=null and companyName!=''">
+            and company.company_id=#{companyName}
+        </if>
+        <if test="customerName!=null and customerName!=''">
+            and customer.customer_id=#{customerName}
+        </if>
+        <if test="orderNumber!=null and orderNumber!=''">
+            and header.order_number=#{orderNumber}
+        </if>
+        <if test="orderStatus!=null and orderStatus!=''">
+            and header.order_status=#{orderStatus}
+        </if>
+        <if test="nameLike!=null and nameLike!=''">
+            and item.item_code = #{nameLike}
+        </if>
+    </select>
+
+    <select id="getmessage" resultType="hbi.core.sale.dto.Middle">
+        select header.order_number orderNumber,
+        company.company_name companyName,
+        customer.customer_name customerName,
+        header.order_date orderDate,
+        header.order_status orderStatus,
+        line.orderd_quantity*line.unit_selling_price  price
+        from hap_ar_customers customer,
+        hap_org_companys company ,
+        hap_om_order_headers header,
+        hap_om_order_lines line,
+        hap_inv_inventory_items item
+        where  header.company_id =company.company_id
+        and header.customer_id=customer.customer_id
+        and line.header_id=header.header_id
+        and item.inventory_item_id=line.inventory_item_id
+        <if test="_parameter!=null and _parameter!=''">
+           and header.order_number = #{_parameter,jdbcType=VARCHAR}
+        </if>
+    </select>
+
+    <select id="detectOrderNumber" resultType="hbi.core.sale.dto.OrderHeaders">
+        select * from hap_om_order_headers where order_number = #{_parameter,jdbcType=VARCHAR}
+    </select>
+
+    <insert id="insertOrderHeader" useGeneratedKeys="true" keyProperty="header_id"
+            parameterType="hbi.core.sale.dto.Middle">
+         INSERT  INTO  hap_om_order_headers
+         (order_number,company_id,order_date,order_status,customer_id)
+         values
+         (#{orderNumber},#{companyName},#{orderDate},"新建",#{customerName})
+    </insert>
+
+    <select id="getOrderHeader" resultType="int">
+        select header_id from hap_om_order_headers
+        where order_number=#{_parameter,jdbcType=VARCHAR}
+    </select>
+
+    <insert id="insertOrderLines" parameterType="hbi.core.sale.dto.Middle">
+        INSERT INTO hap_om_order_lines
+        (header_id,line_number,INVENTORY_ITEM_ID,
+        ORDERD_QUANTITY,ORDER_QUANTITY_UOM,
+        UNIT_SELLING_PRICE,DESCRIPTION,COMPANY_ID)
+        VALUES
+        (#{orderNumber},#{lineId},
+        (select INVENTORY_ITEM_ID from hap_inv_inventory_items where item_code = #{itemCode}),
+        #{orderdQuantity},#{orderQuantityUom},#{price},#{description},#{companyName}
+        )
+</insert>
+
+</mapper>

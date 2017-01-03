@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="hbi.core.sale.mapper.OrderLinesMapper">
+    <select id="fildOrderMessage" resultType="hbi.core.sale.dto.Middle">
+        select
+        item.item_code itemCode,
+        line.unit_selling_price unitSellingPrice,
+        item.item_description itemDescription,
+        item.ITEM_UOM itemUom,
+        line.line_id lineId,
+        line.ORDERD_QUANTITY orderdQuantity,
+        line.ORDER_QUANTITY_UOM orderQuantityUom,
+        line.ORDERD_QUANTITY*line.unit_selling_price price,
+        line.DESCRIPTION description
+       from
+       hap_ar_customers customer,
+       hap_org_companys company ,
+       hap_om_order_headers header,
+       hap_om_order_lines line,
+       hap_inv_inventory_items item
+       where  header.company_id =company.company_id
+       and header.customer_id=customer.customer_id
+       and line.header_id=header.header_id
+       and item.inventory_item_id=line.inventory_item_id
+       <if test="_parameter!=null and _parameter!=''">
+          and header.order_number=#{_parameter,jdbcType=VARCHAR}
+       </if>
+    </select>
+</mapper>

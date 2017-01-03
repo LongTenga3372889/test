@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="hbi.core.hssp.mapper.TrxTypeMapper">
+    <resultMap id="trxType" type="hbi.core.hssp.dto.TrxType">
+        <result column="TRX_TYPE_ID" property="trxTypeId"></result>
+        <result column="TRX_TYPE" property="trxType" ></result>
+    </resultMap>
+    <select id="getTrxTypeName" resultMap="trxType">
+        select * from hss_setup_trx_type_b
+    </select>
+    <select id="findallTrxType" resultType="hbi.core.hssp.dto.TrxType" parameterType="hbi.core.hssp.dto.TrxType">
+        select
+        TRX_TYPE_ID trxTypeId,TRX_TYPE trxType,TRX_TYPE_NAME trxTypeName,
+        VERSION_NUMBER versionNumber,STATUS_CODE statusCode,START_DATE startDate,
+        END_DATE endDate,LEVEL_NO levelNo,OBJECT_VERSION_NUMBER objectVersionNumber
+        from hss_setup_trx_type_b where 1=1
+        <if test="trxType!=null and trxType!=''">
+            and TRX_TYPE=#{trxType}
+        </if><if test="trxTypeName!=null and trxTypeName!=''">
+            and TRX_TYPE_NAME=#{trxTypeName}
+        </if><if test="statusCode!=null and statusCode!=''">
+            and STATUS_CODE=#{statusCode}
+        </if>
+        order by TRX_TYPE,VERSION_NUMBER
+    </select>
+    <insert id="createTrxType" useGeneratedKeys="true" keyProperty="trxTypeId" parameterType="hbi.core.hssp.dto.TrxType">
+        INSERT INTO hss_setup_trx_type_b
+        (trx_type,TRX_TYPE_NAME,STATUS_CODE,LEVEL_NO,START_DATE,
+        OBJECT_VERSION_NUMBER,CREATION_DATE,CREATED_BY,
+        LAST_UPDATED_BY,LAST_UPDATE_DATE,END_DATE)VALUES(
+        #{trxType},#{trxTypeName},#{statusCode},
+        #{levelNo},#{startDate},1,#{startDate},
+        #{createdBy},#{lastUpdatedBy},#{startDate},#{endDate}
+        )
+    </insert>
+
+    <update id="updataTrxType" parameterType="hbi.core.hssp.dto.TrxType">
+        update hss_setup_trx_type_b SET STATUS_CODE=#{statusCode},
+        START_DATE=#{startDate},END_DATE=#{endDate},LEVEL_NO=#{levelNo},OBJECT_VERSION_NUMBER=OBJECT_VERSION_NUMBER+1
+        where TRX_TYPE_ID = #{trxTypeId} and OBJECT_VERSION_NUMBER = #{objectVersionNumber}
+    </update>
+
+    <select id="findTrxType" parameterType="hbi.core.hssp.dto.TrxType" resultType="int">
+        select count(*) from hss_setup_trx_type_b where
+        (TRX_TYPE=#{trxType} and VERSION_NUMBER=#{versionNumber})
+        or
+        (TRX_TYPE_NAME=#{trxTypeName} and VERSION_NUMBER=#{versionNumber})
+    </select>
+    <delete id="deleteTreType" parameterType="hbi.core.hssp.dto.TrxType">
+        delete from hss_setup_trx_type_b where TRX_TYPE_ID = #{trxTypeId} and OBJECT_VERSION_NUMBER = #{objectVersionNumber}
+    </delete>
+    <select id="findUpdateNeed" parameterType="hbi.core.hssp.dto.TrxType" resultType="int">
+        select count(*) from hss_setup_trx_type_b where TRX_TYPE=#{trxType} and TRX_TYPE_NAME=#{trxTypeName} and STATUS_CODE="有效"
+    </select>
+    <select id="updateyouxiao" parameterType="long" resultType="int">
+            select count(*) from hss_setup_trx_type_b where TRX_TYPE_ID=#{trxTypeId} and STATUS_CODE="有效"
+    </select>
+    <select id= "findOneTrxType" parameterType="long" resultType="hbi.core.hssp.dto.TrxType">
+        select Trx_Type_Name trxTypeName,status_code statusCode from hss_setup_trx_type_b where TRX_TYPE_ID =#{trxTypeId}
+    </select>
+    <insert id="createTrxDetail" parameterType="hbi.core.hssp.dto.TrxType" >
+        insert into hss_setup_trx_detail_b (TRX_ID,DETAIL_TRX_TYPE,DETAIL_TRX_TYPE_NAME,
+        CATEGORY_CODE,OBJECT_VERSION_NUMBER,CREATION_DATE,CREATED_BY,LAST_UPDATED_BY,
+        LAST_UPDATE_DATE)
+        values(#{trxTypeId},#{trxType},#{trxTypeName},#{statusCode},#{objectVersionNumber},
+        #{startDate},#{createdBy},#{lastUpdatedBy},#{startDate})
+    </insert>
+    <insert id="createOtherTrxType" useGeneratedKeys="true" keyProperty="trxTypeId"  parameterType="hbi.core.hssp.dto.TrxType">
+        insert into HSS_SETUP_TRX_TYPE_B (
+        trx_type ,trx_type_name ,version_number ,status_code,
+        start_date ,end_date,level_no,object_version_number,
+        creation_date,created_by,
+        last_updated_by ,last_update_date)
+        select trx_type,trx_type_name,
+        (select max(version_number)+1 from HSS_SETUP_TRX_TYPE_B
+        where trx_type=#{trxType} and trx_type_name=#{trxTypeName} ),
+        '拟定',start_date,end_date,level_no,
+        object_version_number,creation_date,created_by,
+        last_updated_by,last_update_date
+        from HSS_SETUP_TRX_TYPE_B where trx_type_id=#{trxTypeId}
+    </insert>
+    <select id="findOneTrxDetail" parameterType="long" resultType="hbi.core.hssp.dto.TrxDetail">
+        select  TRX_DETAIL_ID trxDetailId,
+                TRX_ID trxId,
+                DETAIL_TRX_TYPE detailTrxType,
+                DETAIL_TRX_TYPE_NAME detailTrxTypeName,
+                OBJECT_VERSION_NUMBER objectVersionNumber,
+                creation_date creationDate,
+                created_by createdBy,
+                LAST_UPDATE_DATE lastUpdateDate,
+                last_updated_by lastUpdatedBy,
+                CATEGORY_CODE categoryCode,
+                IS_DISPLAY_FLAG isDisplayFlag
+        from hss_setup_trx_detail_b where trx_id=#{trxTypeId} and parent_detail_id is null
+    </select>
+    <insert id="insertOneTrxDetail" useGeneratedKeys="true" keyProperty="trxDetailId"  parameterType ="hbi.core.hssp.dto.TrxDetail">
+        insert into hss_setup_trx_detail_b (TRX_ID,DETAIL_TRX_TYPE,
+        DETAIL_TRX_TYPE_NAME,OBJECT_VERSION_NUMBER,creation_date,created_by,
+        LAST_UPDATE_DATE,last_updated_by,CATEGORY_CODE,IS_DISPLAY_FLAG) values(
+        #{trxId},#{detailTrxType},#{detailTrxTypeName},#{objectVersionNumber},
+        #{creationDate},#{createdBy},#{lastUpdateDate},#{lastUpdatedBy},#{categoryCode},
+        #{isDisplayFlag}
+        )
+    </insert>
+    <select id="moreTrxDetail" parameterType ="long" resultType="hbi.core.hssp.dto.TrxDetail">
+        select  TRX_DETAIL_ID trxDetailId,
+                TRX_ID trxId,
+                DETAIL_TRX_TYPE detailTrxType,
+                DETAIL_TRX_TYPE_NAME detailTrxTypeName,
+                OBJECT_VERSION_NUMBER objectVersionNumber,
+                creation_date creationDate,
+                created_by createdBy,
+                LAST_UPDATE_DATE lastUpdateDate,
+                last_updated_by lastUpdatedBy,
+                CATEGORY_CODE categoryCode,
+                IS_DISPLAY_FLAG isDisplayFlag,
+                parent_detail_id parentDetailId
+        from hss_setup_trx_detail_b where parent_detail_id=#{parentDetailId}
+    </select>
+    <insert id="insertMoreTrxDetail" useGeneratedKeys="true" keyProperty="trxDetailId" parameterType="hbi.core.hssp.dto.TrxDetail">
+         insert into hss_setup_trx_detail_b(PARENT_DETAIL_ID,TRX_ID,DETAIL_TRX_TYPE,
+         DETAIL_TRX_TYPE_NAME,OBJECT_VERSION_NUMBER,creation_date,created_by,
+         LAST_UPDATE_DATE,last_updated_by,CATEGORY_CODE,IS_DISPLAY_FLAG) values(
+         #{parentDetailId},#{trxId},#{detailTrxType},#{detailTrxTypeName},
+         #{objectVersionNumber},#{creationDate},#{createdBy},
+         #{lastUpdateDate},#{lastUpdatedBy},#{categoryCode},#{isDisplayFlag}
+         )
+    </insert>
+</mapper>

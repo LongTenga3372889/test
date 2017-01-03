@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="hbi.core.sale.mapper.ItemsMapper">
+    <resultMap id="item" type="hbi.core.sale.dto.Item">
+        <result column="inventory_Item_Id" property="inventoryItemId"></result>
+        <result column="item_Code" property="itemCode"></result>
+        <result column="item_Description" property="itemDescription"></result>
+    </resultMap>
+    <select id="finditem" resultMap="item">
+        select * from hap_inv_inventory_items
+    </select>
+</mapper>

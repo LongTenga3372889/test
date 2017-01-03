@@ -1,0 +1,624 @@
+<#include "./include/header.html">
+    <script src="${base.contextPath}/common/code?OrderStatusData=HSSP_MATH_CODE" type="text/javascript"></script>
+    <script src="${base.contextPath}/common/code?OrderLine=STARTCODE" type="text/javascript"></script>
+    <script src="${base.contextPath}/common/code?taskColumType=taskColumType" type="text/javascript"></script>
+    <script src="${base.contextPath}/common/code?taskColumValueType=taskColumValueType" type="text/javascript"></script>
+    <script src="${base.contextPath}/common/code?taskDateFormat=taskDateFormat" type="text/javascript"></script>
+    <body>
+    <style>
+        span.k-icon.k-i-search {
+            top: 10px !important;
+            left: 3px !important;
+        }
+        span.k-textbox .k-icon{
+            left: 1px !important;
+        }
+    </style>
+    <script src="http://cdn.bootcss.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+    <script type="text/javascript">
+        var viewModel = kendo.observable({
+            model: {},
+            createFunction:function(){
+                if(itemHeaderId != 0) {
+                    $('#grid').data('kendoGrid').addRow();
+                }else{
+                    kendo.ui.showInfoDialog({
+                        message:'请先保存系统代码'
+                    })
+                }
+            },
+            saveFunction: function () {
+                if(itemHeaderId != 0){
+                    $('#grid').data('kendoGrid').saveChanges();
+                }else{
+                    kendo.ui.showInfoDialog({
+                        message:'请先保存系统代码'
+                    })
+                }
+            },
+            queryResource: function (e) {
+                $('#grid').data('kendoGrid').dataSource.page(1);
+            },
+            resetForm: function (e) {
+                var formData = viewModel.model.toJSON();
+                for (k in formData) {
+                    viewModel.model.set(k, null);
+                }
+            }
+        });
+    </script>
+
+    <div class="panel" style="padding: 0px;border:none;box-shadow: none;">
+        <form class="form-horizontal" id="myForm">
+            <div class="panel-body">
+                <div class="row" style="margin-bottom: 10px;">
+                    <div class="col-sm-3">
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">系统代码</label>
+                            <div class="col-sm-7">
+                                <input type="text"  id="sourceSystemCode"
+                                       data-bind="value:model.sourceSystemCode" class="k-textbox" required>
+                            </div>
+                            <script>
+                                $("#sourceSystemCode").kendoLov($.extend(${lovProvider.getLov(base.contextPath
+                                                ,base.locale,"LOV_HSSP_SYSCODE")},{
+                                       change:function(e){
+                                           viewModel.model.set("companyName",viewModel.model.get("sourceSystemCode"));
+                                       }
+                                    }
+                                ));
+                            </script>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-3">
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">系统名称</label>
+                            <div class="col-sm-7">
+                                <input type="text" name="dongjie" style="background: #ababab" id="salename" disabled="true"
+                                       data-bind="value:model.companyName" class="k-textbox">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-3">
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">创建人</label>
+                            <div class="col-sm-7">
+                                <input type="text" name="dongjie" style="background: #ababab" id="username" disabled="true"
+                                       data-bind="value:model.attributeCategory" class="k-textbox">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-3">
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">创建日期</label>
+                            <div class="col-sm-7">
+                                <input type="text" name="dongjie" style="background: #ababab" id="creationDate" disabled="true"
+                                       data-bind="value:model.creationDate" class="k-textbox">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row ">
+                    <div class="col-sm-3">
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">映射名称</label>
+                            <div class="col-sm-7">
+                                <input type="text"  style="width: 100%" id="interfaceName"
+                                       data-bind="value:model.interfaceName" class="k-textbox" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="form-group">
+                            <label class="col-sm-3  control-label">数据类型</label>
+                            <div class="col-sm-7">
+                                <input style="width: 100%" id="dataTypeCode"
+                                       data-bind="value:model.dataTypeCode" required>
+                                <script>
+                                    $("#dataTypeCode").kendoDropDownList({
+                                    dataSource: {
+                                    data: OrderStatusData
+                                    },
+                                    index: -1,
+                                    valuePrimitive: true,
+                                    dataTextField: "meaning",
+                                    dataValueField: "value"
+                                    });
+                                </script>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="form-group">
+                            <label class="col-sm-3  control-label">开始日期</label>
+                            <div class="col-sm-7">
+                                <input type="text" name="dongjie" style="background: #ababab"  id="startDate" disabled="true"
+                                       data-bind="value:model.startDate" class="k-textbox">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="form-group">
+                            <label class="col-sm-3  control-label">结束日期</label>
+                            <div class="col-sm-7">
+                                <input type="text" style="" id="endDate"
+                                       data-bind="value:model.endDate">
+                            </div>
+                            <script>
+                                $("#endDate").kendoDateTimePicker();
+                            </script>
+                        </div>
+                    </div>
+                </div>
+                <div class="row ">
+                    <div class="col-sm-5">
+                        <div class="form-group">
+                            <label class="col-sm-2  control-label">映射说明</label>
+                            <div class="col-sm-9">
+                                <input type="text" style="width: 100%" id="description"
+                                       data-bind="value:model.description" class="k-textbox" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-2">
+                        <div class="form-group">
+                            <label class="col-sm-3  control-label">启用</label>
+                            <div class="col-sm-4">
+                                <input type="checkbox" id="enabledFlag" data-bind="value:model.enabledFlag" >
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="form-group">
+                            <label class="col-sm-3  control-label">冻结</label>
+                            <div class="col-sm-4"onclick="play()">
+                                <input type="checkbox" id="frozenFlag"  data-bind="value:model.frozenFlag" >
+                            </div>
+                        </div>
+                    </div>
+                    <script>
+                        function play() {
+                            var frozenFlag = viewModel.model.get("frozenFlag");
+                            if(frozenFlag==1){
+                                $("input").attr("disabled",true);
+                                $("input").css('background','#ababab');
+                                $(".k-input").css('background','#ababab');
+                                $("span").attr("disabled",true);
+                                kendo.ui.showInfoDialog({
+                                    message:'当前页面为冻结状态'
+                                });
+                            }if(frozenFlag==0){
+                                $("input").attr("disabled",false);
+                                $("input").css('background','');
+                                $(".k-input").css('background','');
+                                $("input[name='dongjie']").css('background','#ababab');
+                                $("input[name='dongjie']").attr("disabled",false);
+                                $("span").attr("disabled",false);
+                            }
+                        }
+                    </script>
+                    <div class="col-sm-2">
+                        <div class="form-group">
+                            <div class="col-sm-4">
+                                <span class="btn btn-primary" type="button" onclick="saveHeader()">
+                                                    保存</span>
+                            </div>
+                        </div>
+                        <script>
+                            var interfaceName ;
+                            var validator = $("#myForm").kendoValidator().data("kendoValidator");
+                            function saveHeader() {
+                                if(validator.validate()) {
+                                    var save = "";
+                                    save = "sourceSystemCode=" + viewModel.model.companyName;
+                                    save = save + "&itemHeaderId="+itemHeaderId;
+                                    save = save + "&objectVersionNumber=" + viewModel.model.objectVersionNumber;
+                                    save = save + "&attributeCategory=" + viewModel.model.attributeCategory;
+                                    save = save + "&creationDates=" + viewModel.model.creationDate;
+                                    save = save + "&interfaceName=" + viewModel.model.interfaceName;
+                                    save = save + "&dataTypeCode=" + viewModel.model.dataTypeCode;
+                                    save = save + "&startDates=" + viewModel.model.startDate;
+                                    save = save + "&endDates=" + viewModel.model.endDate;
+                                    save = save + "&description=" + viewModel.model.description;
+                                    save = save + "&enabledFlag=" + viewModel.model.enabledFlag;
+                                    save = save + "&frozenFlag=" + viewModel.model.frozenFlag;
+                                    $.post("createItemHeader", save, function (data) {
+                                        if(typeof(data.rows) != "undefined"){
+                                            itemHeaderId = data.rows[0];
+                                            viewModel.model.set("objectVersionNumber",data.rows[1]);
+                                            kendo.ui.showInfoDialog({
+                                                message:'成功'
+                                            });
+                                        }else{
+                                            kendo.ui.showInfoDialog({
+                                                message:'失败'
+                                            });
+                                        }
+                                    });
+                                }else{
+                                    kendo.ui.showInfoDialog({
+                                        message:'请填写完整'
+                                    })
+                                }
+                            }
+                        </script>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <script>kendo.bind($('#myForm'), viewModel);</script>
+    <script>
+        $("#enabledFlag").kendoCheckbox({
+            checkedValue:'1',
+            uncheckedValue:'0'
+        });
+        $("#frozenFlag").kendoCheckbox({
+            checkedValue:'1',
+            uncheckedValue:'0'
+        });
+        viewModel.model.enabledFlag='0';
+        viewModel.model.frozenFlag='0';
+        var itemHeaderId = '${RequestParameters.a!null}';
+        if(itemHeaderId==0) {
+            $.post("getUserName", function (data) {
+                viewModel.model.set("attributeCategory", data.rows[0]);
+                viewModel.model.set("startDate", data.rows[1]);
+                viewModel.model.set("creationDate", data.rows[1]);
+                viewModel.model.set("objectVersionNumber",1);
+            });
+        }
+        if(itemHeaderId!=0){
+            $.post("findItemHeaderOne","itemHeaderId="+itemHeaderId,function(data){
+                $("#sourceSystemCode").prev().find(".k-input").val(data.rows[0].sourceSystemCode);
+                $("#sourceSystemCode").val("b");
+                viewModel.model.set("objectVersionNumber",data.rows[0].objectVersionNumber);
+                viewModel.model.set("creationDate",data.rows[0].creationDate);
+                viewModel.model.set("interfaceName",data.rows[0].interfaceName);
+                viewModel.model.set("dataTypeCode",data.rows[0].dataTypeCode);
+                viewModel.model.set("startDate",data.rows[0].startDate);
+                viewModel.model.set("endDate",data.rows[0].endDate);
+                viewModel.model.set("description",data.rows[0].description);
+                viewModel.model.set("companyName",data.rows[0].attribute1);
+                viewModel.model.set("attributeCategory",data.rows[0].attributeCategory);
+                if(data.rows[0].enabledFlag==1){
+                    viewModel.model.set("enabledFlag",data.rows[0].enabledFlag);
+                }
+                if(data.rows[0].frozenFlag==1){
+                    viewModel.model.set("frozenFlag",data.rows[0].frozenFlag);
+                    kendo.ui.showInfoDialog({
+                        message:'当前页面为冻结状态'
+                    });
+                    $("input").attr("disabled",true);
+                    $("input").css('background','#ababab');
+                    $(".k-input").css('background','#ababab');
+                    $("span").attr("disabled",true);
+                }
+            })
+        }
+
+    </script>
+
+
+
+
+
+
+    <div class="col-sm-12" style="margin-top: 10px;">
+        <div id="tabContent" class="tab-content">
+            <div class="tab-pane fade in active" style="margin-top: 10px;" id="maintain">
+                <div id="page-content">
+                    <div class="pull-left" id="toolbar-btn" style="padding-bottom:10px;">
+                        <span class="btn btn-primary k-grid-add" style="float:left;" data-bind="click:createFunction">新建</span>
+                        <span class="btn btn-success k-grid-save-changes"   data-bind="click:saveFunction" style="float:left;margin-right:5px;">保存</span>
+                        <span  onclick="deleteData()" class="btn btn-danger"  style="float:left;">删除</span>
+                    </div>
+
+                    <div id='grid-container' style="clear: both">
+                        <div id="grid"></div>
+                    </div>
+                    <script>kendo.bind($('#toolbar-btn'), viewModel);</script>
+                </div>
+            </div>
+
+
+
+            <div id="showTreeUnit" class="tab-pane fade">
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <script type="text/javascript">
+        var dataArray = [];
+        for(var i=0;i<300;i++){
+
+            dataArray.push({"meaning": "VALUE"+(i+1)});
+        }
+        var columnNameDataSource = new kendo.data.DataSource({
+            data:dataArray
+        })
+        //主要  标签页
+        var dataSource = new kendo.data.DataSource({
+            transport: {
+                read: {
+                    url: "getItemLineList?itemHeaderId="+itemHeaderId,
+                    contentType: "application/json",
+                    type: "POST",
+                    dataType: "json"
+                },
+                create: {
+                    url:  "saveItemLine?itemHeaderId="+itemHeaderId,
+                    contentType: "application/json",
+                    dataType: "json",
+                    type: "POST"
+                },
+                update: {
+                    url: "updateItemLine",
+                    contentType: "application/json",
+                    type: "POST"
+                },
+                destroy: {
+                    url: "deleteLineList",
+                    contentType: "application/json",
+                    type: "POST"
+                },
+                parameterMap: function (options, type) {
+                    if (type !== "read" && options.models) {
+                        var datas = Hap.prepareSubmitParameter(options, type);
+                        return kendo.stringify(datas);
+                    } else if (type === "read") {
+                        return Hap.prepareQueryParameter(viewModel.model.toJSON(), options);
+                    }
+                }
+            },
+            requestEnd: function(e){
+                if (e.response.success && e.type == "update") {
+                    kendo.ui.showInfoDialog({
+                        message:'更新成功'
+                    });
+                }else if (!e.response.success && e.type == "update") {
+                    kendo.ui.showInfoDialog({
+                        message:'版本不一致'
+                    });
+                }
+            },
+            batch: true,
+            serverPaging: true,
+            pageSize: 10,
+            schema: {
+                data: 'rows',
+                total:'total',
+                model: {
+                    id: "itemLineId",
+                    fields: {
+                        columnLen	: {validation: {required: true, productnamevalidation: function (input) {
+                                if (input.is("[name='columnLen']") && input.val() != "") {
+                                    input.attr("data-productnamevalidation-msg", "长度必须为正整数");
+                                    return /^\+?[1-9][0-9]*$/.test(input.val());
+                                }
+                                    return true;
+                                }
+                            }
+                        },
+                        requiredFlag:{defaultValue: '1',type: 'boolean',checkedValue:'1',uncheckedValue:'0'},
+                        showFlag:{defaultValue: '1',type: 'boolean',checkedValue:'1',uncheckedValue:'0'},
+                        enableFlag:{defaultValue: '1',type: 'boolean',checkedValue:'1',uncheckedValue:'0'},
+                        uniqueFlag:{defaultValue: '1',type: 'boolean',checkedValue:'1',uncheckedValue:'0'}
+                    }
+                }
+            }
+        });
+        //****************************************************
+
+        var grid = $("#grid").kendoGrid({
+            dataSource: dataSource,
+            height: '100%',
+            resizable: true,
+            sortable: true,
+            selectable:true,
+            editable:'inline',
+            selectable: 'multiple,rowbox',
+            pageable: {
+                pageSizes: [5, 10, 20, 50],
+                refresh: true,
+                buttonCount: 5
+            },
+            columns: [
+                {   field: "titleText",
+                    title: '字段描述',
+                    width: 100,
+                    editor: function(container, options){
+                        var editor = $('<input type="text" name="titleText" class="k-input k-text-box" required validationMessage="必输">');
+                        editor.css('width','100%');
+                        container.append(editor);
+                    }
+                },
+                {
+                    field: "columeTypeCode",
+                    title: '字段类型',
+                    width: 100,
+                    template: function(dataItem){
+                        for(var i in taskColumType){
+                            if(dataItem.columeTypeCode == taskColumType[i].value){
+                                return taskColumType[i].meaning
+                            }
+                        }
+                        return ''
+                    },
+                    editor: function(container, options){
+                        $('<input required validationMessage="必输" name="' + options.field + '"/>')
+                            .appendTo(container)
+                            .kendoComboBox({
+                                dataTextField: "meaning",
+                                dataValueField: "value",
+                                valuePrimitive: true,
+                                dataSource: taskColumType,
+                            });
+
+                    }
+
+                },
+                {
+                    field: "columnName",
+                    title: '字段',
+                    width: 100,
+                    editor: function(container, options){
+                        var editor = $('<input type="text" name="columnName" class="k-input k-text-box" required validationMessage="必输">')
+                            .appendTo(container).kendoComboBox({
+                                valuePrimitive: true,
+                                dataTextField: "meaning",
+                                dataValueField: "value",
+                                dataSource: columnNameDataSource
+                            });
+                    }
+                }, {
+                    field: "seqNum",
+                    title: '序号',
+                    width: 100,
+                    editor: function(container, options){
+                        var html = '<input class="k-input k-textbox k-valid" data-bind="value:seqNum" name="seqNum" disabled="disabled" type="text">';
+                        $(html).appendTo(container);
+                    }
+                }, {
+                    field: "valueType",
+                    title: '值类型',
+                    width: 100,
+                    template: function(dataItem){
+                        for(var i in taskColumValueType){
+                            if(dataItem.valueType == taskColumValueType[i].value){
+                                return taskColumValueType[i].meaning
+                            }
+                        }
+                        return ''
+                    },
+                    editor: function(container, options){
+                        $('<input id="valueType" required validationMessage="必输" name="' + options.field + '"/>')
+                            .appendTo(container)
+                            .kendoComboBox({
+                                dataTextField: "meaning",
+                                dataValueField: "lookupCode",
+                                valuePrimitive: true,
+                                dataSource: taskColumValueType,
+                                change: function(e) {
+                                    var d = this.value();
+                                    console.log(d);
+                                    if(d=="日期") {
+                                        options.model.set('columnLen', null);
+                                        $('#columnLen').data('kendoNumericTextBox').enable(false);
+                                        $('#columnFormat').data('kendoComboBox').enable(true);
+                                    }
+                                    else{
+                                        options.model.set('columnFormat', null);
+                                        $('#columnLen').data('kendoNumericTextBox').enable(true);
+                                        $('#columnFormat').data('kendoComboBox').enable(false);
+                                    }
+
+                                }
+                            });
+                    }
+                }, {
+                    field: "columnLen",
+                    title: '长度',
+                    width: 100,
+                    editor: function(container, options){
+                        console.log(container);
+                        $('<input id="columnLen" type="text" name="columnLen" class="k-input k-text-box" >')
+                            .appendTo(container)
+                            .kendoNumericTextBox({});
+                    }
+                }, {
+                    field: "valueSet",
+                    title: '验证值集',
+                    width: 100,
+                    editor: function(container, options){
+                        $('<input name="' + options.field + '"/>')
+                            .appendTo(container)
+                            .kendoLov($.extend({"queryColumns":1,"height":400,"width":400,"readonly":true,"dataValueField":"code","dataTextField":"code","title":"验证值集","placeholder":"验证值集","form":"<div class='form-group' style='width:100.0%;float:left;margin-left:5px;'><label class='col-sm-3 control-label'>代码</label><div class='col-sm-9'><input name='code' data-bind='value:data.code' style='width:100%'></div></div><div class='form-group' style='width:100.0%;float:left;margin-left:5px;'><label class='col-sm-3 control-label'>描述</label><div class='col-sm-9'><input name='description' data-bind='value:data.description' style='width:100%'></div></div>","formItemMap":{"code":{"type":"kendoMaskedTextBox"},"description":{"type":"kendoMaskedTextBox"}},"grid":{"height":400,"url":"common/lov/SYS_LOV","columns":[{"field":"code","title":"代码","width":200,"attributes":{"style":"text-align:center"}},{"field":"description","title":"描述","width":200,"attributes":{"style":"text-align:center"}}]}}, {
+                                textField: 'valueSet',
+                                model    : options.model,
+                            }));
+                    }
+                },{
+                    field: "description",
+                    title: '值集效验字段',
+                    width: 100
+                },{
+                    field: "columnFormat",
+                    title: '掩码格式',
+                    width: 100,
+                    template: function(item){
+                        console.log(item);
+                        console.log(taskDateFormat);
+                        for(var i in taskDateFormat){
+                            if(taskDateFormat[i].value==item.columnFormat){
+                                return taskDateFormat[i].meaning;
+                            }
+                        }
+                        return '';
+                    },
+                    editor: function(container, options){
+                        $('<input  id="columnFormat" name="' + options.field + '"/>')
+                            .appendTo(container)
+                            .kendoComboBox({
+                                dataTextField: "meaning",
+                                dataValueField: "lookupCode",
+                                valuePrimitive: true,
+                                dataSource: taskDateFormat,
+                            });
+                    }
+                },{
+                    field: "requiredFlag",
+                    title: '必输',
+                    width: 70,
+                    attributes: {style: "text-align:center"}
+                },{
+                    field: "showFlag",
+                    title: '显示',
+                    width: 70,
+                    attributes: {style: "text-align:center"}
+                },{
+                    field: "enableFlag",
+                    title: '启用',
+                    width: 70,
+                    attributes: {style: "text-align:center"}
+                },{
+                    field: "uniqueFlag",
+                    title: '唯一性',
+                    width: 70,
+                    attributes: {style: "text-align:center"}
+                },{
+                    title:"操作",
+                    command: [{name:"edit"}],
+                    attributes: {style: "text-align:center"},
+                    width: 50
+                }
+            ],
+        }
+        ).data("kendoGrid");
+
+        function deleteData() {
+            Hap.deleteGridSelection({
+                grid:$('#grid')
+            });
+        }
+
+        $("#newWin").kendoValidator();
+        Hap.autoResizeGrid("#grid");
+
+        $("#dataTypeCode").kendoDropDownList({
+            dataSource: {
+                data: OrderStatusData
+            },
+            index: -1,
+            valuePrimitive: true,
+            dataTextField: "meaning",
+            dataValueField: "value"
+        });
+    </script>
+    </body>
+</html>

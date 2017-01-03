@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="hbi.core.sale.mapper.CustomerMapper">
+    <resultMap id="customer" type="hbi.core.sale.dto.Customer">
+        <result column="customer_id" property="customerId"></result>
+        <result column="customer_Name" property="customerName" ></result>
+        <result  column="customer_Number" property="customerNumber"></result>
+    </resultMap>
+    <select id="selectcustomer" resultMap="customer" parameterType="String">
+        select * from hap_ar_customers
+        <if test="companyId!=null">
+         where  company_id=#{companyId}
+        </if>
+    </select>
+</mapper>
